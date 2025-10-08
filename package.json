@@ -1,7 +1,7 @@
 {
-  "name": "backend-service-template",
+  "name": "Order Service",
   "version": "1.0.0",
-  "description": "Backend Service Template for Express Applications",
+  "description": "Mernspace Order Service",
   "main": "server.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon src/server.ts",
@@ -27,10 +27,12 @@
     "cookie-parser": "^1.4.7",
     "express": "^5.1.0",
     "express-jwt": "^8.5.1",
+    "express-validator": "^7.2.1",
     "http-errors": "^2.0.0",
     "js-yaml": "^4.1.0",
     "jwks-rsa": "^3.2.0",
     "mongoose": "^8.19.1",
+    "mongoose-aggregate-paginate-v2": "^1.1.4",
     "uuid": "^13.0.0",
     "winston": "^3.18.3"
   },

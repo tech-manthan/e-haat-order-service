@@ -1,0 +1,21 @@
+import { Request } from "express";
+
+export interface Address {
+  text: string;
+  isDefault: boolean;
+}
+
+export interface Customer {
+  userId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  addresses: Address[];
+  tenants: string[];
+}
+
+export interface GetCustomerRequest extends Request {
+  body: {
+    tenantId: string;
+  };
+}
