@@ -1,4 +1,5 @@
 import { Request } from "express-jwt";
+import mongoose from "mongoose";
 
 export type AuthCookie = {
   accessToken: string;
@@ -14,4 +15,8 @@ export interface AuthRequest extends Request {
     lastName: string;
     email: string;
   };
+}
+
+export interface IdParams {
+  id: mongoose.Types.ObjectId;
 }

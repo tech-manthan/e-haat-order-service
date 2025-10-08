@@ -1,5 +1,5 @@
-import { AggregatePaginateModel } from "mongoose";
-import { Customer } from "./customer.type";
+import mongoose, { AggregatePaginateModel } from "mongoose";
+import { Address, Customer } from "./customer.type";
 
 export default class CustomerService {
   constructor(private customerRepository: AggregatePaginateModel<Customer>) {}
@@ -37,6 +37,26 @@ export default class CustomerService {
 
     if (!updatedCustomer) {
       throw new Error(`Customer with userId ${userId} not found`);
+    }
+
+    return updatedCustomer;
+  }
+
+  async addAddress({
+    customerId,
+    address,
+  }: {
+    customerId: mongoose.Types.ObjectId;
+    address: Address;
+  }) {
+    const updatedCustomer = await this.customerRepository.findOneAndUpdate(
+      { _id: customerId },
+      { $addToSet: { addresses: address } },
+      { new: true },
+    );
+
+    if (!updatedCustomer) {
+      throw new Error(`Customer with customeId ${customerId} not found`);
     }
 
     return updatedCustomer;

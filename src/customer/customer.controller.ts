@@ -1,9 +1,9 @@
 import { Response } from "express";
 import CustomerService from "./customer.service";
 import { Logger } from "winston";
-import { AuthRequest } from "../common/types";
-import { GetCustomerRequest } from "./customer.type";
-import { validationResult } from "express-validator";
+import { AuthRequest, IdParams } from "../common/types";
+import { AddAddressRequest, GetCustomerRequest } from "./customer.type";
+import { matchedData, validationResult } from "express-validator";
 import createHttpError from "http-errors";
 
 export default class CustomerController {
@@ -12,6 +12,7 @@ export default class CustomerController {
     private logger: Logger,
   ) {
     this.getCustomer = this.getCustomer.bind(this);
+    this.addAddress = this.addAddress.bind(this);
   }
 
   async getCustomer(req: GetCustomerRequest, res: Response) {
@@ -59,5 +60,30 @@ export default class CustomerController {
       userId: id,
     });
     res.json(customer);
+  }
+
+  async addAddress(req: AddAddressRequest, res: Response) {
+    const result = validationResult(req);
+
+    if (!result.isEmpty()) {
+      throw createHttpError(400, result.array().at(0)?.msg as string);
+    }
+
+    const { id } = matchedData<IdParams>(req, {
+      onlyValidData: true,
+    });
+
+    const { text, isDefault } = req.body;
+
+    const updatedCustomer = await this.customerService.addAddress({
+      customerId: id,
+      address: {
+        text,
+        isDefault: isDefault ? isDefault : false,
+      },
+    });
+    this.logger.info("address added successfully");
+
+    return res.json(updatedCustomer);
   }
 }

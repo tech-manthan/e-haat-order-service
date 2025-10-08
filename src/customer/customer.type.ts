@@ -19,3 +19,10 @@ export interface GetCustomerRequest extends Request {
     tenantId: string;
   };
 }
+
+export interface AddAddressRequest extends Request {
+  body: {
+    text: string;
+    isDefault?: boolean;
+  };
+}
