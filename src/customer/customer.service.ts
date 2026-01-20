@@ -1,5 +1,9 @@
-import mongoose, { AggregatePaginateModel } from "mongoose";
-import { Address, Customer } from "./customer.type";
+import mongoose, {
+  AggregatePaginateModel,
+  AggregatePaginateResult,
+} from "mongoose";
+import { Address, Customer, CustomerFilters } from "./customer.type";
+import { PaginateQuery } from "../common/types";
 
 export default class CustomerService {
   constructor(private customerRepository: AggregatePaginateModel<Customer>) {}
@@ -60,5 +64,41 @@ export default class CustomerService {
     }
 
     return updatedCustomer;
+  }
+
+  async getCustomers(
+    q: string,
+    { tenantId, isBanned }: CustomerFilters,
+    paginateQuery: PaginateQuery,
+  ): Promise<AggregatePaginateResult<Customer>> {
+    const searchQueryRegexp = new RegExp(q, "i");
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const filters: Record<string, any> = {};
+
+    if (tenantId !== undefined && tenantId !== null)
+      filters.tenantId = tenantId;
+
+    if (isBanned !== undefined) {
+      filters.isBanned = isBanned;
+    }
+
+    const aggregate = this.customerRepository.aggregate([
+      {
+        $match: {
+          ...filters,
+          $or: [
+            { firstName: searchQueryRegexp },
+            { lastName: searchQueryRegexp },
+            { email: searchQueryRegexp },
+          ],
+        },
+      },
+      { $sort: { createdAt: -1 } },
+    ]);
+
+    return this.customerRepository.aggregatePaginate<Customer>(aggregate, {
+      ...paginateQuery,
+    });
   }
 }

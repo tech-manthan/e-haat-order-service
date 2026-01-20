@@ -43,8 +43,12 @@ const customerSchema = new mongoose.Schema<Customer>(
       required: false,
     },
     tenants: {
-      type: [String],
+      type: [Number],
       required: true,
+    },
+    isBanned: {
+      type: Boolean,
+      default: false,
     },
   },
   {

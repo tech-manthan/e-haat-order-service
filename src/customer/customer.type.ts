@@ -12,6 +12,7 @@ export interface Customer {
   lastName: string;
   addresses: Address[];
   tenants: string[];
+  isBanned?: boolean;
 }
 
 export interface GetCustomerRequest extends Request {
@@ -25,4 +26,15 @@ export interface AddAddressRequest extends Request {
     text: string;
     isDefault?: boolean;
   };
+}
+
+export interface CustomerFilters {
+  tenantId?: number | undefined;
+  isBanned?: boolean | undefined;
+}
+
+export interface CustomerValidFilters extends CustomerFilters {
+  q: string;
+  currentPage: number;
+  perPage: number;
 }

@@ -1,8 +1,12 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import CustomerService from "./customer.service";
 import { Logger } from "winston";
 import { AuthRequest, IdParams } from "../common/types";
-import { AddAddressRequest, GetCustomerRequest } from "./customer.type";
+import {
+  AddAddressRequest,
+  CustomerValidFilters,
+  GetCustomerRequest,
+} from "./customer.type";
 import { matchedData, validationResult } from "express-validator";
 import createHttpError from "http-errors";
 
@@ -12,6 +16,7 @@ export default class CustomerController {
     private logger: Logger,
   ) {
     this.getCustomer = this.getCustomer.bind(this);
+    this.getAllCustomers = this.getAllCustomers.bind(this);
     this.addAddress = this.addAddress.bind(this);
   }
 
@@ -85,5 +90,34 @@ export default class CustomerController {
     this.logger.info("address added successfully");
 
     return res.json(updatedCustomer);
+  }
+
+  async getAllCustomers(req: Request, res: Response) {
+    const err = createHttpError(404, "Hello");
+    throw err;
+    const { currentPage, perPage, q, tenantId, isBanned } =
+      matchedData<CustomerValidFilters>(req, {
+        onlyValidData: true,
+      });
+
+    const { docs, totalDocs, page, limit } =
+      await this.customerService.getCustomers(
+        q,
+        {
+          tenantId,
+          isBanned,
+        },
+        {
+          page: currentPage,
+          limit: perPage,
+        },
+      );
+
+    res.json({
+      data: docs,
+      total: totalDocs,
+      currentPage: page,
+      perPage: limit,
+    });
   }
 }
